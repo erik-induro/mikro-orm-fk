@@ -1,4 +1,6 @@
-import { Collection, Entity, IdentifiedReference, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+	Collection, Entity, IdentifiedReference, ManyToOne, OneToMany, PrimaryKey, PrimaryKeyType, Property
+} from '@mikro-orm/core';
 
 import { Organization } from './organization';
 import { UserRole } from './user-role';
@@ -20,6 +22,8 @@ export class User {
 
 	@OneToMany({ entity: () => UserRole, mappedBy: (userRole) => userRole.user })
 	userRoles = new Collection<UserRole>(this);
+
+	[PrimaryKeyType]: [string, string];
 
 	constructor(value: Partial<User> = {}) {
 		Object.assign(this, value);

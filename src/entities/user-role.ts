@@ -1,4 +1,4 @@
-import { Entity, Index, ManyToOne, PrimaryKey, Reference } from '@mikro-orm/core';
+import { Entity, Index, ManyToOne, PrimaryKey, PrimaryKeyType, Reference } from '@mikro-orm/core';
 
 import { Role } from '../enums/role';
 import { User } from './user';
@@ -16,6 +16,8 @@ export class UserRole {
 
 	@PrimaryKey({ columnType: 'varchar' })
 	role: Role;
+
+	[PrimaryKeyType]: [string, string, string];
 
 	constructor(value: Partial<UserRole> = {}) {
 		Object.assign(this, value);
