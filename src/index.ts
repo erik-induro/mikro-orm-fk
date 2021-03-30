@@ -1,7 +1,9 @@
 import { GenericContainer } from 'testcontainers';
 
-import { MikroORM, Options } from '@mikro-orm/core';
+import { MikroORM, Options, Reference } from '@mikro-orm/core';
 
+import { Organization } from './entities/organization';
+import { User } from './entities/user';
 import { UserRole } from './entities/user-role';
 import { Role } from './enums/role';
 import MIKRO_ORM_CONFIG from './mikro-orm.config';
@@ -35,12 +37,22 @@ function createMikroOrmConfig(): Options {
 	};
 }
 
-function test(orm: MikroORM) {
-	orm.em.map(UserRole, {
-		user_id: 'cc455d1f-f4c7-4b57-b833-e6ca88239b61',
-		user_organization_id: 'e3dca7ae-6389-49dc-931d-419716828a79',
-		role: Role.admin,
+async function test(orm: MikroORM) {
+	const org = new Organization({ id: 'e3dca7ae-6389-49dc-931d-419716828a79', name: 'Organization' });
+	const user = new User({
+		id: 'cc455d1f-f4c7-4b57-b833-e6ca88239b61',
+		organization: Reference.create(org),
+		email: 'me@test.com',
 	});
+	const userRole = new UserRole({ user: Reference.create(user), role: Role.admin });
+
+	orm.em.persist(org);
+	orm.em.persist(user);
+	orm.em.persist(userRole);
+	await orm.em.flush();
+
+	const data = await orm.em.findOne(UserRole, { user: [user.id, org.id] });
+	console.log('USER ROLE', data);
 }
 
 async function run() {
@@ -58,7 +70,7 @@ async function run() {
 	console.log('End migration');
 
 	console.log('Begin test');
-	test(orm);
+	await test(orm);
 	console.log('End test');
 
 	console.log('Begin disconnect');
@@ -72,4 +84,5 @@ run()
 	})
 	.catch((e) => {
 		console.error('FAIL', e);
+		process.exit(1);
 	});

@@ -9,6 +9,7 @@ const MIKRO_ORM_CONFIG = {
 	entitiesTs: ['./src/entities/**/*.ts'],
 	type: 'postgresql',
 	namingStrategy: UnderscoreNamingStrategy,
+	debug: true,
 	host: process.env.DATABASE_HOST,
 	port: parseInt(process.env.DATABASE_PORT, 10),
 	user: process.env.DATABASE_USER,
@@ -18,7 +19,7 @@ const MIKRO_ORM_CONFIG = {
 	migrations: {
 		tableName: 'migration',
 		path: './src/migrations',
-		pattern: /^\d+\_[\w-]+\.ts$/,
+		pattern: /^[\w-]+\d+\.ts$/,
 		transactional: true,
 		disableForeignKeys: false,
 		allOrNothing: true,
